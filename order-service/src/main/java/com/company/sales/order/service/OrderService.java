@@ -1,11 +1,10 @@
 package com.company.sales.order.service;
 
 import java.time.LocalDate;
-import java.util.Map;
 
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
 
+import com.company.sales.order.client.InventoryClient;
 import com.company.sales.order.dto.InventoryReservationResponse;
 import com.company.sales.order.dto.OrderResponse;
 import com.company.sales.order.entity.Order;
@@ -21,21 +20,16 @@ import lombok.extern.slf4j.Slf4j;
 public class OrderService {
 
         private final OrderRepository orderRepository;
-        private final WebClient webClient;
+
+        private final InventoryClient inventoryClient;
 
         @Transactional
         public OrderResponse placeOrder(Order order) {
 
                 log.info("Calling inventory service");
 
-                InventoryReservationResponse inventoryReservationResponse = webClient.post()
-                                .uri("/inventory/update")
-                                .bodyValue(Map.of(
-                                                "productId", order.getProductId(),
-                                                "quantity", order.getQuantity()))
-                                .retrieve()
-                                .bodyToMono(InventoryReservationResponse.class)
-                                .block();
+                InventoryReservationResponse inventoryReservationResponse = inventoryClient
+                                .reserve(order.getProductId(), order.getQuantity());
 
                 order.setProductName(inventoryReservationResponse.getProductName());
                 order.setStatus("PLACED");
