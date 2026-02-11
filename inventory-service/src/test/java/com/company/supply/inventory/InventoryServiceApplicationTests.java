@@ -1,13 +1,21 @@
-// package com.company.supply.inventory;
+package com.company.supply.inventory;
 
-// import org.junit.jupiter.api.Test;
-// import org.springframework.boot.test.context.SpringBootTest;
+import static org.mockito.Mockito.mockStatic;
 
-// @SpringBootTest
-// class InventoryServiceApplicationTests {
+import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.test.context.SpringBootTest;
 
-// @Test
-// void contextLoads() {
-// }
+@SpringBootTest
+class InventoryServiceApplicationTests {
 
-// }
+    @Test
+    void testMainMethodWithoutException() {
+        try (MockedStatic<SpringApplication> mockedSpringApplication = mockStatic(SpringApplication.class)) {
+            InventoryServiceApplication.main(new String[] {});
+            mockedSpringApplication
+                    .verify(() -> SpringApplication.run(InventoryServiceApplication.class, new String[] {}));
+        }
+    }
+}
